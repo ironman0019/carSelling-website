@@ -13,7 +13,7 @@ class CarController extends Controller
      */
     public function index()
     {
-        $cars = User::find(1)->cars()->latest()->get();
+        $cars = User::find(1)->cars()->with(['primaryImage', 'maker', 'model'])->latest()->paginate(15);
         return view('car.index', compact('cars'));
     }
 
@@ -67,18 +67,17 @@ class CarController extends Controller
 
     public function search()
     {
-        $query = Car::where('published_at', '<', now())->orderBy('published_at', 'desc');
+        $query = Car::where('published_at', '<', now())->with(['primaryImage', 'city', 'maker', 'model', 'carType', 'fuelType'])->orderBy('published_at', 'desc');
 
-        $carCount = $query->count();
 
-        $cars = $query->limit(30)->get();
+        $cars = $query->paginate(15);
 
-        return view('car.search', compact('cars', 'carCount'));
+        return view('car.search', compact('cars'));
     }
 
     public function watchlist()
     {
-        $cars = User::find(4)->favouriteCars;
+        $cars = User::find(4)->favouriteCars()->with(['primaryImage', 'city', 'maker', 'model', 'carType', 'fuelType'])->paginate(15);
         return view('car.watchlist', compact('cars'));
     }
     
